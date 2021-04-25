@@ -8,8 +8,9 @@ CMD_MONITOR_SYSTEM = "-monitor-system"
 
 
 def print_usage():
-    print("python client.py " + CMD_REGISTER)
-    print("python client.py " + CMD_MONITOR_SYSTEM)
+    pre_cmd = "python client.py "
+    print(pre_cmd + CMD_REGISTER)
+    print(pre_cmd + CMD_MONITOR_SYSTEM)
 
 
 def register():
