@@ -6,6 +6,7 @@ import psutil
 CMD_LISTEN = "-listen"
 CMD_LIST_ALL_DEVICES = "-list-all-devices"
 CMD_CREATE_REPORT = "-create-report"
+CMD_CHANGE_CLIENT_REPORT_TIME = "-change-report-time"
 
 
 def print_usage():
@@ -13,6 +14,8 @@ def print_usage():
     print(pre_cmd + CMD_LISTEN)
     print(pre_cmd + CMD_LIST_ALL_DEVICES)
     print(pre_cmd + CMD_CREATE_REPORT + "<device's id>")
+    print(pre_cmd + CMD_CHANGE_CLIENT_REPORT_TIME +
+          "<device's id> + <time in seconds>")
 
 
 def listen():
@@ -53,6 +56,14 @@ def create_report(id):
     pass
 
 
+def change_client_report_time(id, report_time):
+    """
+    Send UCP msg to client including TCP port, recurring time
+    If id == -10 then send to all clients
+    """
+    pass
+
+
 def main(argv):
     if len(argv) < 1:
         print_usage()
@@ -70,6 +81,18 @@ def main(argv):
             return
 
         create_report(id)
+    elif argv[0] == CMD_CHANGE_CLIENT_REPORT_TIME:
+        id = int(argv[1])
+        while id == None or id != -1:
+            print("Please insert client's ID.")
+            print("If you want to cancel, insert -1")
+            print("If you want to send all, insert -10")
+            id = input("Client ID:")
+        if id == -1:
+            return
+
+        report_time = argv[2]
+        change_client_report_time(id, report_time)
 
 
 if __name__ == "__main__":
