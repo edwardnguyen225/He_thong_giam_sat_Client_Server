@@ -1,4 +1,4 @@
-# He_thong_giam_sat_Client_Server
+# Hệ thống giám sát Client Server
 
 Đây là dự án hệ thống giám sát Client Server, bài tập lớn 1, môn Mạng máy tính
 
