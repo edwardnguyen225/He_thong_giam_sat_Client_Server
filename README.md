@@ -4,7 +4,7 @@
 
 ## Installation
 
-Sử dụng package manager [pip](https://pip.pypa.io/en/stable/) để cài đặt những package cần thiết.
+Cài đặt python 3.9 [tại đây](https://www.python.org/downloads/). Sau đó, sử dụng package manager [pip](https://pip.pypa.io/en/stable/) để cài đặt những package cần thiết.
 
 ```bash
 pip install psutil
