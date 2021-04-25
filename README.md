@@ -19,6 +19,7 @@ python client.py -monitor-system
 python server.py -listen
 python server.py -list-all-devices
 python server.py -create-report <device's id>
+python server.py -change-report-time <device's id> <time in seconds>
 ```
 
 ## Author
