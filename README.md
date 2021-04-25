@@ -24,4 +24,4 @@ python server.py -create-report <device's id>
 ## Author
 
 - [edwardnguyen225](https://github.com/edwardnguyen2255)
-- [manh](https://github.com/)
+- [manh](https://github.com/tienmanh294)
