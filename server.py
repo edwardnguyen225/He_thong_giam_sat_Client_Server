@@ -25,7 +25,6 @@ def listen():
         Check if msg is valid:
             If not then send back error
         Create new client
-        Save new client into List_of_clients.json
         Then send successful msg to client
 
     Else if receive report msg then:
@@ -33,6 +32,15 @@ def listen():
             If not then send back error
         Store report into Client_reports.json
         Then send successful msg to client
+    """
+    pass
+
+
+def create_new_client(name, ip, udp_port, register_date):
+    """
+    Create new client
+    Save new client into List_of_clients.json
+    Return True if successful, else False
     """
     pass
 
