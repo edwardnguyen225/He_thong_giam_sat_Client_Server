@@ -133,10 +133,3 @@ def print_disk_usage():
         print(f'======= Device: {partition} =======')
         for key in partition_info:
             print(f'\t{key}: {partition_info[key]}')
-
-
-# print_system_info()
-# print_boot_time()
-# print_cpu_info()
-# print_memory_usage()
-print_disk_usage()
