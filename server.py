@@ -88,7 +88,7 @@ def main(argv):
         if id == -1:
             return
 
-        create_report(id)
+        create_report_in_csv(id)
     elif argv[0] == CMD_CHANGE_CLIENT_REPORT_TIME:
         id = int(argv[1])
         while id == None or id != -1:
