@@ -19,7 +19,7 @@ def register():
     Send TCP message to Server, including: Name, IP, UDP port, Current date time
     Then listen for the response
         If responded msg is successful then:
-            Retrieve from response: ID, TCP port, recurring time
+            Retrieve from response: id, server_tcp_port, recurring_time
             Write those data into client.json
             Start monitor system
         Else responded msg is failed, display error message
@@ -29,7 +29,7 @@ def register():
 
 def monitor_system():
     """
-    Check if (current time - init time) % recurring time = 0
+    Check if (current time - init time) % recurring_time = 0
     If True then send data msg to Server
     """
     pass
