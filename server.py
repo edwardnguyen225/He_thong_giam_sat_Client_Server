@@ -53,9 +53,9 @@ def list_all_devices():
     pass
 
 
-def create_report(id):
+def create_report_in_csv(id):
     """
-    Find all report having client's id
+    Load <id>_report.json
     Write all into <id>_report.csv? 
     !!! NOTE: need to discuss bout the output file extension
     """
