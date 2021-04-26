@@ -1,0 +1,45 @@
+{
+   "2021-04-26 09:19:01.214034": {
+      "Boot time": "2021-04-25 10:17:54.214035",
+      "Memory usage": {
+         "Total": "15.88GB",
+         "Available": "6.22GB",
+         "Used": "9.66GB",
+         "Percentage": 60.8
+      },
+      "Disk usage": {
+         "Total read": "4.42GB",
+         "Total write": "11.73GB",
+         "Partition list": {
+            "C:\\": {
+               "Mountpoint": "C:\\",
+               "File system type": "NTFS",
+               "Total Size": [
+                  "237.87GB"
+               ],
+               "Used": [
+                  "66.50GB"
+               ],
+               "Free": [
+                  "171.37GB"
+               ],
+               "Percentage": 28.0
+            },
+            "G:\\": {
+               "Mountpoint": "G:\\",
+               "File system type": "FAT32",
+               "Total Size": [
+                  "237.87GB"
+               ],
+               "Used": [
+                  "75.07GB"
+               ],
+               "Free": [
+                  "162.80GB"
+               ],
+               "Percentage": 31.6
+            }
+         }
+      }
+   }
+}
