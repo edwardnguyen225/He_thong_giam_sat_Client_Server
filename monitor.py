@@ -1,3 +1,4 @@
+import json
 import psutil
 import platform
 from datetime import datetime
@@ -133,3 +134,28 @@ def print_disk_usage():
         print(f'======= Device: {partition} =======')
         for key in partition_info:
             print(f'\t{key}: {partition_info[key]}')
+
+
+class Report:
+    def __init__(self):
+        self.init_time = datetime.now()
+        self.boot_time = get_boot_time()
+        self.mem_usage = get_memory_usage()
+        self.disk_usage = get_disk_usage()
+
+    def to_dict(self):
+        dict = {}
+        dict[str(self.init_time)] = {
+            "Boot time": str(self.boot_time),
+            "Memory usage": self.mem_usage,
+            "Disk usage": self.disk_usage
+        }
+        return dict
+
+    def write_JSON(self, path):
+        try:
+            dict = self.to_dict()
+            with open(path, "w") as file:
+                json.dump(dict, file, indent=3)
+        except IOError:
+            raise IOError
