@@ -2,6 +2,7 @@ import sys
 import os
 import time
 import psutil
+import json
 
 CMD_REGISTER = "-register"
 CMD_MONITOR_SYSTEM = "-monitor-system"
@@ -32,7 +33,21 @@ def monitor_system():
     Check if (current time - init time) % recurring_time = 0
     If True then send data msg to Server
     """
-    pass
+    print("Monitoring system")
+    path_to_client_json = os.path.join(
+        ".", "database", "client", "client_info.json")
+    with open(path_to_client_json) as f:
+        client_info = json.load(f)
+
+    id = client_info["id"]
+    recurring_time = int(client_info["recurring_time"])
+    server_tcp_port = client_info["server_tcp_port"]
+
+    while True:
+        print("Time to send report")
+
+        # Wait for the next time to send the report
+        time.sleep(recurring_time)
 
 
 def main(argv):
