@@ -1,7 +1,4 @@
 import sys
-import os
-import time
-import psutil
 
 CMD_LISTEN = "-listen"
 CMD_LIST_ALL_DEVICES = "-list-all-devices"
