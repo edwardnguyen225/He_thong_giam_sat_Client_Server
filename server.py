@@ -3,6 +3,7 @@ import socket
 import threading
 import json
 import checker
+import os
 
 CMD_LISTEN = "-listen"
 CMD_LIST_ALL_DEVICES = "-list-all-devices"
@@ -15,11 +16,20 @@ SERVER = socket.gethostbyname(socket.gethostname())
 ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'
 
-MESSAGE_WRONG_PREFIX = "Wrong prefix"
+MESSAGE_FAILED = "[FAILED]"
+MESSAGE_WRONG_PREFIX = MESSAGE_FAILED + " Wrong prefix"
+MESSAGE_NOT_REGISTERED = MESSAGE_FAILED + " Not registered"
+
 
 msg_type_dict = {
     ">": "Add new report"
 }
+
+path_to_list_of_clients = os.path.join(
+    ".", "database", "server", "List_of_clients.json")
+
+with open(path_to_list_of_clients) as f:
+    list_of_clients = json.load(f)
 
 
 def print_usage():
@@ -77,8 +87,15 @@ def handle_client(conn, addr):
             return
 
         msg_type = msg_type_dict[msg[0]]
-        report = json.loads(msg[1:])
-        checker.validate_report(report)
+        json_start_index = msg.index("{")
+        client_id = msg[1:json_start_index]
+        if not checker.is_id_registered(client_id, list_of_clients):
+            conn.send(MESSAGE_NOT_REGISTERED.encode(FORMAT))
+            conn.close()
+            return
+
+        # report = json.loads(msg[1:])
+        # checker.validate_report(report)
         print(f"[{addr}] {msg_type}")
         conn.send("Successful".encode(FORMAT))
 
