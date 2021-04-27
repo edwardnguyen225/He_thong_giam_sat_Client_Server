@@ -31,6 +31,11 @@ def get_system_info():
     return system_info
 
 
+def get_system_name():
+    uname = platform.uname()
+    return uname.system
+
+
 def print_system_info():
     print("="*40, "System Information", "="*40)
     system_info = get_system_info()
