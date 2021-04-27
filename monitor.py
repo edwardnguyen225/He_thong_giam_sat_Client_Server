@@ -136,8 +136,19 @@ def print_disk_usage():
             print(f'\t{key}: {partition_info[key]}')
 
 
+def write_JSON(json_data, path):
+    try:
+        with open(path, "w") as file:
+            json.dump(json_data, file, indent=3)
+    except IOError:
+        raise IOError
+
+
 class Report:
-    def __init__(self):
+    def __init__(self, id):
+        if type(id) is not int:
+            raise ValueError("ID must be an integer")
+        self.id = id
         self.init_time = datetime.now()
         self.boot_time = get_boot_time()
         self.mem_usage = get_memory_usage()
@@ -152,10 +163,5 @@ class Report:
         }
         return dict
 
-    def write_JSON(self, path):
-        try:
-            dict = self.to_dict()
-            with open(path, "w") as file:
-                json.dump(dict, file, indent=3)
-        except IOError:
-            raise IOError
+    def to_string(self):
+        return json.dumps(self.to_dict())
