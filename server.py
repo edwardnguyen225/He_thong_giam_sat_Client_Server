@@ -104,6 +104,7 @@ def handle_client(conn, addr):
             conn.close()
             return
 
+        add_new_report(client_id, report)
         conn.send("Successful".encode(FORMAT))
 
     conn.close()
@@ -124,6 +125,25 @@ def list_all_devices():
     Print all devices from that list, including device's name and ID
     """
     pass
+
+
+def get_path_to_report_file(id):
+    file_name = id + "_report.json"
+    path_to_report = os.path.join(
+        ".", "database", "server", "reports", file_name)
+    return path_to_report
+
+
+def add_new_report(id, report):
+    path_to_report = get_path_to_report_file(id)
+    with open(path_to_report) as f:
+        old_report = json.load(f)
+    old_report.update(report)
+    try:
+        with open(path_to_report, "w") as file:
+            json.dump(old_report, file, indent=3)
+    except IOError:
+        raise IOError
 
 
 def create_report_in_csv(id):
