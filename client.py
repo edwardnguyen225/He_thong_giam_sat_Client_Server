@@ -31,6 +31,7 @@ def register():
 
 class Client:
     def __init__(self):
+        self.name = monitor.get_system_name()
         # Check if client is registered
         path_to_client_json = os.path.join(
             ".", "database", "client", "client_info.json")
@@ -62,7 +63,8 @@ class Client:
         while True:
             print(f"[REPORTING] Report number: {report_count}")
             msg = ">"  # For reporting purpose
-            msg += str(self.ID)
+            msg += str(self.ID) + "@" + self.name
+            
             report = self.get_report()
             msg += report
             self.send(msg)
