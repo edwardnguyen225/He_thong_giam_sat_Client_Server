@@ -4,7 +4,6 @@ import os
 
 
 def is_id_registered(id, list_of_clients):
-    print(f"{id}: {type(id)}")
     if id not in list_of_clients:
         return False
     return True
