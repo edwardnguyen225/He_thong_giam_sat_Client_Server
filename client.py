@@ -1,8 +1,9 @@
 import sys
 import os
 import time
-import psutil
 import json
+import socket
+import monitor as monitor
 
 CMD_REGISTER = "-register"
 CMD_MONITOR_SYSTEM = "-monitor-system"
@@ -28,35 +29,73 @@ def register():
     pass
 
 
-def monitor_system():
-    """
-    Check if (current time - init time) % recurring_time = 0
-    If True then send data msg to Server
-    """
-    print("Monitoring system")
-    path_to_client_json = os.path.join(
-        ".", "database", "client", "client_info.json")
-    with open(path_to_client_json) as f:
-        client_info = json.load(f)
+class Client:
+    def __init__(self):
+        # Check if client is registered
+        path_to_client_json = os.path.join(
+            ".", "database", "client", "client_info.json")
+        if not os.path.isfile(path_to_client_json):
+            raise Exception("This client is not registered")
 
-    id = client_info["id"]
-    recurring_time = int(client_info["recurring_time"])
-    server_tcp_port = client_info["server_tcp_port"]
+        self.load_client_info(path_to_client_json)
+        self.HEADER = 64
+        self.FORMAT = 'utf-8'
 
-    while True:
-        print("Time to send report")
+    def load_client_info(self, path_to_client_json):
+        with open(path_to_client_json) as f:
+            client_info = json.load(f)
 
-        # Wait for the next time to send the report
-        time.sleep(recurring_time)
+        self.ID = int(client_info["id"])
+        self.SERVER = client_info["server_ip"]
+        # self.SERVER = "172.17.80.1"
+        self.PORT = client_info["server_tcp_port"]
+        self.recurring_time = int(client_info["recurring_time"])
+        self.ADDR = (self.SERVER, self.PORT)
+
+    def monitor_system(self):
+        """
+        Check if (current time - init time) % recurring_time = 0
+        If True then send data msg to Server
+        """
+        print("Monitoring system")
+        report_count = 0
+        while True:
+            print(f"[REPORTING] Report number: {report_count}")
+            msg = ">"  # For reporting purpose
+            report = self.get_report()
+            msg += report
+            self.send(msg)
+
+            report_count += 1
+            #  Wait for the next reporting time
+            time.sleep(self.recurring_time)
+
+    def send(self, msg):
+        _client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        _client.connect(self.ADDR)
+        message = msg.encode(self.FORMAT)
+        msg_length = len(message)
+        send_length = str(msg_length).encode(self.FORMAT)
+        send_length += b' ' * (self.HEADER - len(send_length))
+        _client.send(send_length)
+        _client.send(message)
+        print(_client.recv(2048).decode(self.FORMAT))
+
+    def get_report(self):
+        report = monitor.Report(self.ID).to_string()
+        return report
 
 
 def main(argv):
     if len(argv) < 1:
         print_usage()
-    elif argv[0] == CMD_REGISTER:
+        return
+
+    if argv[0] == CMD_REGISTER:
         register()
     elif argv[0] == CMD_MONITOR_SYSTEM:
-        monitor_system()
+        client = Client()
+        client.monitor_system()
 
 
 if __name__ == "__main__":
