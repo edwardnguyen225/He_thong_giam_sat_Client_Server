@@ -33,7 +33,7 @@ def get_system_info():
 
 def get_system_name():
     uname = platform.uname()
-    return uname.system
+    return uname.node
 
 
 def print_system_info():
