@@ -1,9 +1,25 @@
 import sys
+import socket
+import threading
+import json
+import checker
 
 CMD_LISTEN = "-listen"
 CMD_LIST_ALL_DEVICES = "-list-all-devices"
 CMD_CREATE_REPORT = "-create-report"
 CMD_CHANGE_CLIENT_REPORT_TIME = "-change-report-time"
+
+HEADER = 64
+PORT = 12345
+SERVER = socket.gethostbyname(socket.gethostname())
+ADDR = (SERVER, PORT)
+FORMAT = 'utf-8'
+
+MESSAGE_WRONG_PREFIX = "Wrong prefix"
+
+msg_type_dict = {
+    ">": "Add new report"
+}
 
 
 def print_usage():
@@ -30,7 +46,43 @@ def listen():
         Store report into Client_reports.json
         Then send successful msg to client
     """
-    pass
+
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind(ADDR)
+
+    print("[STARTING] server is starting...")
+
+    server.listen()
+    print(f"[LISTENING] Server is listening on {SERVER}")
+    while True:
+        conn, addr = server.accept()
+
+        # Create new thread for each connection
+        thread = threading.Thread(target=handle_client, args=(conn, addr))
+        thread.start()
+        print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
+
+
+def handle_client(conn, addr):
+    print(f"[NEW CONNECTION] {addr} connected.")
+
+    msg_length = conn.recv(HEADER).decode(FORMAT)
+
+    if msg_length:
+        msg_length = int(msg_length)
+        msg = conn.recv(msg_length).decode(FORMAT)
+        if msg[0] not in msg_type_dict:
+            conn.send(MESSAGE_WRONG_PREFIX.encode(FORMAT))
+            conn.close()
+            return
+
+        msg_type = msg_type_dict[msg[0]]
+        report = json.loads(msg[1:])
+        checker.validate_report(report)
+        print(f"[{addr}] {msg_type}")
+        conn.send("Successful".encode(FORMAT))
+
+    conn.close()
 
 
 def create_new_client(name, ip, udp_port, register_date):
