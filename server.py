@@ -87,6 +87,8 @@ def handle_client(conn, addr):
             return
 
         msg_type = msg_type_dict[msg[0]]
+        print(f"[{addr}] {msg_type}")
+
         json_start_index = msg.index("{")
         client_id = msg[1:json_start_index]
         if not checker.is_id_registered(client_id, list_of_clients):
@@ -101,8 +103,7 @@ def handle_client(conn, addr):
             conn.send(errors.encode(FORMAT))
             conn.close()
             return
-        
-        print(f"[{addr}] {msg_type}")
+
         conn.send("Successful".encode(FORMAT))
 
     conn.close()
