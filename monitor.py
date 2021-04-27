@@ -155,8 +155,8 @@ class Report:
         dict = {}
         dict[str(self.init_time)] = {
             "Boot time": str(self.boot_time),
-            "Memory usage": self.mem_usage,
-            "Disk usage": self.disk_usage
+            "Memory usage": self.mem_usage
+            # ,"Disk usage": self.disk_usage
         }
         return dict
 
