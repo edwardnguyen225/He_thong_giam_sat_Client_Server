@@ -17,8 +17,8 @@ ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'
 
 MESSAGE_FAILED = "[FAILED]"
-MESSAGE_WRONG_PREFIX = MESSAGE_FAILED + " Wrong prefix"
-MESSAGE_NOT_REGISTERED = MESSAGE_FAILED + " Not registered"
+MESSAGE_WRONG_PREFIX = MESSAGE_FAILED + " MsgPrefixError"
+MESSAGE_NOT_REGISTERED = MESSAGE_FAILED + " UnknownClientError"
 
 
 msg_type_dict = {
@@ -94,8 +94,14 @@ def handle_client(conn, addr):
             conn.close()
             return
 
-        # report = json.loads(msg[1:])
-        # checker.validate_report(report)
+        report = json.loads(msg[json_start_index:])
+        errors = checker.get_report_error(report)
+        if errors:
+            errors = MESSAGE_FAILED + errors
+            conn.send(errors.encode(FORMAT))
+            conn.close()
+            return
+        
         print(f"[{addr}] {msg_type}")
         conn.send("Successful".encode(FORMAT))
 
