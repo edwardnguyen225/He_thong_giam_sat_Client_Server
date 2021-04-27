@@ -18,7 +18,8 @@ FORMAT = 'utf-8'
 
 MESSAGE_FAILED = "[FAILED]"
 MESSAGE_WRONG_PREFIX = MESSAGE_FAILED + " MsgPrefixError"
-MESSAGE_NOT_REGISTERED = MESSAGE_FAILED + " UnknownClientError"
+MESSAGE_UNKNOWN_ID = MESSAGE_FAILED + " UnknownIDError"
+MESSAGE_UNKNOWN_NAME = MESSAGE_FAILED + " UnknownNameError"
 
 
 msg_type_dict = {
@@ -87,12 +88,19 @@ def handle_client(conn, addr):
             return
 
         msg_type = msg_type_dict[msg[0]]
-        print(f"[{addr}] {msg_type}")
+
+        client_name_prefix_index = msg.index("@")
+        client_id = msg[1:client_name_prefix_index]
+        print(f"[{addr}] {msg_type} from id({client_id})")
+        if not checker.is_id_registered(client_id, list_of_clients):
+            conn.send(MESSAGE_UNKNOWN_ID.encode(FORMAT))
+            conn.close()
+            return
 
         json_start_index = msg.index("{")
-        client_id = msg[1:json_start_index]
-        if not checker.is_id_registered(client_id, list_of_clients):
-            conn.send(MESSAGE_NOT_REGISTERED.encode(FORMAT))
+        name = msg[client_name_prefix_index + 1:json_start_index]
+        if not checker.is_name_correct(name, client_id, list_of_clients):
+            conn.send(MESSAGE_UNKNOWN_NAME.encode(FORMAT))
             conn.close()
             return
 
