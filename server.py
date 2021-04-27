@@ -75,7 +75,7 @@ def change_client_report_time(id, report_time):
 def main(argv):
     if len(argv) < 1:
         print_usage()
-    if argv[0] == CMD_LISTEN:
+    elif argv[0] == CMD_LISTEN:
         listen()
     elif argv[0] == CMD_LIST_ALL_DEVICES:
         list_all_devices()

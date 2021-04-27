@@ -38,7 +38,7 @@ def monitor_system():
 def main(argv):
     if len(argv) < 1:
         print_usage()
-    if argv[0] == CMD_REGISTER:
+    elif argv[0] == CMD_REGISTER:
         register()
     elif argv[0] == CMD_MONITOR_SYSTEM:
         monitor_system()
