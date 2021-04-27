@@ -27,6 +27,14 @@ def is_id_registered(id, list_of_clients):
     return True
 
 
+def is_name_correct(name, id, list_of_clients):
+    # try catch is to prevent id not exist
+    try:
+        return name == list_of_clients[id]["name"]
+    except:
+        return False
+
+
 def get_report_error(report_json):
     """
     Check if report has any error
