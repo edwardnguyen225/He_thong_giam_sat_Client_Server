@@ -45,7 +45,7 @@ class Client:
         with open(path_to_client_json) as f:
             client_info = json.load(f)
 
-        self.ID = int(client_info["id"])
+        self.ID = client_info["id"]
         self.SERVER = client_info["server_ip"]
         # self.SERVER = "172.17.80.1"
         self.PORT = client_info["server_tcp_port"]
@@ -62,6 +62,7 @@ class Client:
         while True:
             print(f"[REPORTING] Report number: {report_count}")
             msg = ">"  # For reporting purpose
+            msg += str(self.ID)
             report = self.get_report()
             msg += report
             self.send(msg)
@@ -82,7 +83,7 @@ class Client:
         print(_client.recv(2048).decode(self.FORMAT))
 
     def get_report(self):
-        report = monitor.Report(self.ID).to_string()
+        report = monitor.Report().to_string()
         return report
 
 
