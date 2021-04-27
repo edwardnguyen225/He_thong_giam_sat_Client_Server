@@ -145,10 +145,7 @@ def write_JSON(json_data, path):
 
 
 class Report:
-    def __init__(self, id):
-        if type(id) is not int:
-            raise ValueError("ID must be an integer")
-        self.id = id
+    def __init__(self):
         self.init_time = datetime.now()
         self.boot_time = get_boot_time()
         self.mem_usage = get_memory_usage()
