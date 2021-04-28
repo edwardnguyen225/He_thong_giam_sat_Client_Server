@@ -43,8 +43,8 @@ def get_report_error(report_json):
     """
     # print(json.dumps(report_json, indent=3))
     errors = {
-        ERROR_VALUE: [],
-        ERROR_NOT_ENOUGH_KEYS: []
+        ERROR_NOT_ENOUGH_KEYS: [],
+        ERROR_VALUE: []
     }
     datetime_str = list(report_json.keys())[0]
     validate_format(datetime_str, DATETIME, errors, "Report timestamp")
