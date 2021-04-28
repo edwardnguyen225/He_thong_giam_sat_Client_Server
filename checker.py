@@ -73,14 +73,19 @@ def validate_dict(curr_dict, template, errors, parent_key=None):
         if key not in template.keys():  # Is this line necessary?
             continue
 
-        if type(value) is dict:
-            inner_dict = curr_dict[key]
-            inner_template = template[key]
-            validate_dict(inner_dict, inner_template, errors, key)
-        else:
-            full_key = key if not parent_key else parent_key + "/" + key
-            # print(f"Checking {key}, {value} is {template[key]}")
-            validate_format(value, template[key], errors, full_key)
+        full_key = key if not parent_key else parent_key + "/" + key
+
+        if type(template[key]) is dict:
+            if type(value) is dict:
+                inner_dict = curr_dict[key]
+                inner_template = template[key]
+                validate_dict(inner_dict, inner_template, errors, key)
+                continue
+            else:
+                errors[ERROR_VALUE].append(full_key + "!=" + "dict")
+
+        # print(f"Checking {key}, {value} is {template[key]}")
+        validate_format(value, template[key], errors, full_key)
 
 
 def validate_dict_keys(curr_dict, template, errors, parent_key=None):
