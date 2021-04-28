@@ -25,7 +25,7 @@ python client.py -monitor-system
 # Sử dụng cmd cho Server
 python server.py -listen
 python server.py -list-all-clients
-python server.py -create-report <client's id>
+python server.py -export-report <client's id>
 python server.py -change-report-time <device's id> <time in seconds>
 ```
 

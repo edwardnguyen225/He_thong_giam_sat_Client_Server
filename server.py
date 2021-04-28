@@ -14,7 +14,7 @@ except ModuleNotFoundError:
 
 CMD_LISTEN = "-listen"
 CMD_LIST_ALL_CLIENTS = "-list-all-clients"
-CMD_CREATE_REPORT = "-create-report"
+CMD_EXPORT_REPORT = "-export-report"
 CMD_CHANGE_CLIENT_REPORT_TIME = "-change-report-time"
 
 HEADER = 64
@@ -46,7 +46,7 @@ def print_usage():
     pre_cmd = "python server.py "
     print(pre_cmd + CMD_LISTEN)
     print(pre_cmd + CMD_LIST_ALL_CLIENTS)
-    print(pre_cmd + CMD_CREATE_REPORT + "<client's id>")
+    print(pre_cmd + CMD_EXPORT_REPORT + "<client's id>")
     print(pre_cmd + CMD_CHANGE_CLIENT_REPORT_TIME +
           "<client's id> + <time in seconds>")
 
@@ -175,7 +175,7 @@ def get_client_report(id):
     return report
 
 
-def create_report_in_csv(id):
+def export_report_to_csv(id):
     """
     Load <id>_report.json
     Write all into <id>_report.csv
@@ -246,12 +246,12 @@ def main(argv):
         listen()
     elif argv[0] == CMD_LIST_ALL_CLIENTS:
         print_list_of_clients()
-    elif argv[0] == CMD_CREATE_REPORT:
+    elif argv[0] == CMD_EXPORT_REPORT:
         if len(argv) < 2:
             raise Exception("Required client's ID")
 
         id = argv[1]
-        create_report_in_csv(id)
+        export_report_to_csv(id)
     elif argv[0] == CMD_CHANGE_CLIENT_REPORT_TIME:
         id = int(argv[1])
         while id == None or id != -1:
