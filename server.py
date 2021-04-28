@@ -46,9 +46,9 @@ def print_usage():
     pre_cmd = "python server.py "
     print(pre_cmd + CMD_LISTEN)
     print(pre_cmd + CMD_LIST_ALL_CLIENTS)
-    print(pre_cmd + CMD_CREATE_REPORT + "<device's id>")
+    print(pre_cmd + CMD_CREATE_REPORT + "<client's id>")
     print(pre_cmd + CMD_CHANGE_CLIENT_REPORT_TIME +
-          "<device's id> + <time in seconds>")
+          "<client's id> + <time in seconds>")
 
 
 def listen():
