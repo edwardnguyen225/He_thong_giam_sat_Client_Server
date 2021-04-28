@@ -4,8 +4,13 @@ import threading
 import json
 import checker
 import os
+import csv
 
 from tabulate import tabulate
+try:
+    from collections.abc import MutableMapping
+except ModuleNotFoundError:
+    from collections import MutableMapping
 
 CMD_LISTEN = "-listen"
 CMD_LIST_ALL_CLIENTS = "-list-all-clients"
@@ -145,34 +150,85 @@ def print_list_of_clients():
     print(tabulate(table, headers, tablefmt="psql"))
 
 
-def get_path_to_report_file(id):
+def add_new_report(id, report):
+    client_report = get_client_report(id)
+    client_report.update(report)
+    try:
+        with open(get_client_report_path(id), "w") as file:
+            json.dump(client_report, file, indent=2)
+    except IOError:
+        raise IOError
+
+
+def get_client_report_path(id):
     file_name = id + "_report.json"
     path_to_report = os.path.join(
         ".", "database", "server", "reports", file_name)
     return path_to_report
 
 
-def add_new_report(id, report):
-    path_to_report = get_path_to_report_file(id)
+def get_client_report(id):
+    # Return client report in dict
+    path_to_report = get_client_report_path(id)
     with open(path_to_report) as f:
-        old_report = json.load(f)
-    old_report.update(report)
-    try:
-        with open(path_to_report, "w") as file:
-            json.dump(old_report, file, indent=3)
-    except IOError:
-        raise IOError
+        report = json.load(f)
+    return report
 
 
 def create_report_in_csv(id):
     """
     Load <id>_report.json
-    Write all into <id>_report.csv? 
+    Write all into <id>_report.csv
     !!! NOTE: need to discuss bout the output file extension
     """
-    if id == None:
-        return None
-    pass
+    if not checker.is_id_registered(id, list_of_clients):
+        print("ID is not registered")
+        return
+
+    dir = os.path.join(".", "csv")
+    if not os.path.isdir(dir):
+        os.mkdir(dir)
+
+    report = get_client_report(id)
+
+    # Create the fieldnames from flatten dict of the first report
+    fieldnames = ["Report datetime"]
+    tmp_report = flatten_dict(list(report.values())[0])
+    for key in tmp_report.keys():
+        fieldnames.append(key)
+
+    csv_path = os.path.join(dir, f"{id}_report.csv")
+    try:
+        with open(os.path.join(csv_path), mode="w") as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+            writer.writeheader()
+            for key, value in report.items():
+                row = {fieldnames[0]: key}
+                value = flatten_dict(value)
+                row.update(value)
+                writer.writerow(row)
+            csv_file.close()
+
+            print(f"Export Client {id} report successfully. Path to CSV file is: {csv_path}")
+    except IOError:
+        raise IOError
+
+
+def flatten_dict(d, parent_key='', sep='_'):
+    """
+    Flatten dict
+    E.g: {'a': 1,'c': {'a': 2, 'b': {'x': 3}}}
+    ---> {'a': 1,'c_a': 2,'c_b_x': 3}
+    """
+    items = []
+    for k, v in d.items():
+        new_key = parent_key + sep + k if parent_key else k
+
+        if isinstance(v, MutableMapping):
+            items.extend(flatten_dict(v, new_key, sep=sep).items())
+        else:
+            items.append((new_key, v))
+    return dict(items)
 
 
 def change_client_report_time(id, report_time):
@@ -191,14 +247,10 @@ def main(argv):
     elif argv[0] == CMD_LIST_ALL_CLIENTS:
         print_list_of_clients()
     elif argv[0] == CMD_CREATE_REPORT:
-        id = int(argv[1])
-        while id == None or id != -1:
-            print("Please insert client's ID.")
-            print("If you want to cancel, insert -1")
-            id = input("Client ID:")
-        if id == -1:
-            return
+        if len(argv) < 2:
+            raise Exception("Required client's ID")
 
+        id = argv[1]
         create_report_in_csv(id)
     elif argv[0] == CMD_CHANGE_CLIENT_REPORT_TIME:
         id = int(argv[1])
