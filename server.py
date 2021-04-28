@@ -16,10 +16,12 @@ SERVER = socket.gethostbyname(socket.gethostname())
 ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'
 
-MESSAGE_FAILED = "[FAILED]"
-MESSAGE_WRONG_PREFIX = MESSAGE_FAILED + " MsgPrefixError"
-MESSAGE_UNKNOWN_ID = MESSAGE_FAILED + " UnknownIDError"
-MESSAGE_UNKNOWN_NAME = MESSAGE_FAILED + " UnknownNameError"
+MSG_SUCCESS = "[Successful]"
+
+PREFIX_FAILED = "[Failed]"
+MSG_ERR_WRONG_PREFIX = PREFIX_FAILED + " MsgPrefixError"
+MSG_ERR_UNKNOWN_ID = PREFIX_FAILED + " UnknownIDError"
+MSG_ERR_UNKNOWN_NAME = PREFIX_FAILED + " UnknownNameError"
 
 
 msg_type_dict = {
@@ -83,7 +85,7 @@ def handle_client(conn, addr):
         msg_length = int(msg_length)
         msg = conn.recv(msg_length).decode(FORMAT)
         if msg[0] not in msg_type_dict:
-            conn.send(MESSAGE_WRONG_PREFIX.encode(FORMAT))
+            conn.send(MSG_ERR_WRONG_PREFIX.encode(FORMAT))
             conn.close()
             return
 
@@ -93,27 +95,27 @@ def handle_client(conn, addr):
         client_id = msg[1:client_name_prefix_index]
         print(f"[{addr}] {msg_type} from id({client_id})")
         if not checker.is_id_registered(client_id, list_of_clients):
-            conn.send(MESSAGE_UNKNOWN_ID.encode(FORMAT))
+            conn.send(MSG_ERR_UNKNOWN_ID.encode(FORMAT))
             conn.close()
             return
 
         json_start_index = msg.index("{")
         name = msg[client_name_prefix_index + 1:json_start_index]
         if not checker.is_name_correct(name, client_id, list_of_clients):
-            conn.send(MESSAGE_UNKNOWN_NAME.encode(FORMAT))
+            conn.send(MSG_ERR_UNKNOWN_NAME.encode(FORMAT))
             conn.close()
             return
 
         report = json.loads(msg[json_start_index:])
         errors = checker.get_report_error(report)
         if errors:
-            errors = MESSAGE_FAILED + errors
+            errors = PREFIX_FAILED + errors
             conn.send(errors.encode(FORMAT))
             conn.close()
             return
 
         add_new_report(client_id, report)
-        conn.send("Successful".encode(FORMAT))
+        conn.send("[Successful]".encode(FORMAT))
 
     conn.close()
 
