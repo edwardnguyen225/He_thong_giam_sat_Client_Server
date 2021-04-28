@@ -19,9 +19,9 @@ FORMAT = 'utf-8'
 MSG_SUCCESS = "[Successful]"
 
 PREFIX_FAILED = "[Failed]"
-MSG_ERR_WRONG_PREFIX = PREFIX_FAILED + " MsgPrefixError"
-MSG_ERR_UNKNOWN_ID = PREFIX_FAILED + " UnknownIDError"
-MSG_ERR_UNKNOWN_NAME = PREFIX_FAILED + " UnknownNameError"
+MSG_ERR_WRONG_PREFIX = PREFIX_FAILED + "MsgPrefixError"
+MSG_ERR_UNKNOWN_ID = PREFIX_FAILED + "UnknownIDError"
+MSG_ERR_UNKNOWN_NAME = PREFIX_FAILED + "UnknownNameError"
 
 
 msg_type_dict = {
