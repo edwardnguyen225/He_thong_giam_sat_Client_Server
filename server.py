@@ -5,8 +5,10 @@ import json
 import checker
 import os
 
+from tabulate import tabulate
+
 CMD_LISTEN = "-listen"
-CMD_LIST_ALL_DEVICES = "-list-all-devices"
+CMD_LIST_ALL_CLIENTS = "-list-all-clients"
 CMD_CREATE_REPORT = "-create-report"
 CMD_CHANGE_CLIENT_REPORT_TIME = "-change-report-time"
 
@@ -38,7 +40,7 @@ with open(path_to_list_of_clients) as f:
 def print_usage():
     pre_cmd = "python server.py "
     print(pre_cmd + CMD_LISTEN)
-    print(pre_cmd + CMD_LIST_ALL_DEVICES)
+    print(pre_cmd + CMD_LIST_ALL_CLIENTS)
     print(pre_cmd + CMD_CREATE_REPORT + "<device's id>")
     print(pre_cmd + CMD_CHANGE_CLIENT_REPORT_TIME +
           "<device's id> + <time in seconds>")
@@ -129,12 +131,18 @@ def create_new_client(name, ip, udp_port, register_date):
     pass
 
 
-def list_all_devices():
+def print_list_of_clients():
     """
     Read List_of_clients.json
     Print all devices from that list, including device's name and ID
     """
-    pass
+    headers = ["ID", "NAME", "IP", "UDP PORT", "REGISTER TIME"]
+    table = []
+    for client in list_of_clients:
+        row = [client]
+        row.extend(list_of_clients[client].values())
+        table.append(row)
+    print(tabulate(table, headers, tablefmt="psql"))
 
 
 def get_path_to_report_file(id):
@@ -180,8 +188,8 @@ def main(argv):
         print_usage()
     elif argv[0] == CMD_LISTEN:
         listen()
-    elif argv[0] == CMD_LIST_ALL_DEVICES:
-        list_all_devices()
+    elif argv[0] == CMD_LIST_ALL_CLIENTS:
+        print_list_of_clients()
     elif argv[0] == CMD_CREATE_REPORT:
         id = int(argv[1])
         while id == None or id != -1:
@@ -204,6 +212,8 @@ def main(argv):
 
         report_time = argv[2]
         change_client_report_time(id, report_time)
+    else:
+        print_usage()
 
 
 if __name__ == "__main__":
