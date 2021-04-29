@@ -234,10 +234,24 @@ def flatten_dict(d, parent_key='', sep='_'):
 
 
 def change_client_report_time(id, report_time):
-    """
-    Send UCP msg to client including TCP port, recurring time
-    If id == -10 then send to all clients
-    """
+    
+    if id==-10:
+    # Set a timeout so the socket does not block
+    # indefinitely when trying to receive data.
+        serverUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        serverUDP.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        serverUDP.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        serverUDP.settimeout(0.2)
+        message = (id,report_time)
+        while True:
+            serverUDP.sendto(message, ('<broadcast>', PORT))
+            print("message sent!")
+            time.sleep(1)
+    elif id!=-1:
+        #send UDP message to a client 
+        serverUDP=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+        serverUDP.bind(ADDR)
+        serverUDP.sendto(message,id)
     pass
 
 

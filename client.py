@@ -87,7 +87,16 @@ class Client:
     def get_report_str(self):
         report = str(monitor.Report())
         return report
-
+    def get_message_UDP(id)
+        if id==-10:
+            clientUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP) # UDP
+            clientUDP.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+            clientUDP.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            clientUDP.bind(("", PORT))
+            while True:
+                data, addr = clientUDP.recvfrom(1024)
+        else
+            data,addr=clientUDP.recvfrom(1024)
 
 def main(argv):
     if len(argv) < 1:
