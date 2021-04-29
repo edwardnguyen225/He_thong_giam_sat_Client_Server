@@ -235,26 +235,57 @@ def flatten_dict(d, parent_key='', sep='_'):
     return dict(items)
 
 
-def change_client_report_time(id, report_time):
+def get_client_ip_and_udp(id):
+    # Return tuple of (client_ip, client_udp_port)
+    client = list_of_clients[id]
+    return (client["ip"], client["client_udp_port"])
 
-    if id == -10:
-        # Set a timeout so the socket does not block
-        # indefinitely when trying to receive data.
-        serverUDP = socket.socket(
-            socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-        serverUDP.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-        serverUDP.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        serverUDP.settimeout(0.2)
-        message = (id, report_time)
-        while True:
-            serverUDP.sendto(message, ('<broadcast>', PORT))
-            print("message sent!")
-            time.sleep(1)
-    elif id != -1:
-        # send UDP message to a client
-        serverUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        serverUDP.bind(ADDR)
-        # serverUDP.sendto(message, id)
+
+def change_client_report_time(id, new_recurring_time):
+    """
+    Send new report time to the client having the id passed
+    """
+    if not checker.is_id_registered(id, list_of_clients):
+        raise Exception("ID is not registered")
+
+    client_ip, client_udp_port = get_client_report(id)
+
+    # TODO: Setup new connection to the client, and send new_recurring_time
+
+    pass
+
+
+def change_all_report_time(new_recurring_time):
+    """
+    Send new report time to the client having the id passed
+    """
+    for id in list_of_clients:
+        client_ip, client_udp_port = get_client_report(id)
+        thread = threading.Thread(
+            target=change_client_report_time, args=(client_ip, client_udp_port), daemon=True)
+        thread.start()
+
+
+# def change_client_report_time(id, report_time):
+
+#     if id==-10:
+#     # Set a timeout so the socket does not block
+#     # indefinitely when trying to receive data.
+#         serverUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+#         serverUDP.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+#         serverUDP.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+#         serverUDP.settimeout(0.2)
+#         message = (id,report_time)
+#         while True:
+#             serverUDP.sendto(message, ('<broadcast>', PORT))
+#             print("message sent!")
+#             time.sleep(1)
+#     elif id!=-1:
+#         #send UDP message to a client
+#         serverUDP=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+#         serverUDP.bind(ADDR)
+#         serverUDP.sendto(message,id)
+#     pass
 
 
 def main(argv):
@@ -271,17 +302,18 @@ def main(argv):
         id = argv[1]
         export_report_to_csv(id)
     elif argv[0] == CMD_CHANGE_CLIENT_REPORT_TIME:
-        id = int(argv[1])
-        while id == None or id != -1:
-            print("Please insert client's ID.")
-            print("If you want to cancel, insert -1")
-            print("If you want to send all, insert -10")
-            id = input("Client ID:")
-        if id == -1:
-            return
+        if len(argv) < 1:
+            raise Exception(
+                "Required client's ID or -all (to send all Clients)")
+        elif len(argv) < 2:
+            raise Exception("Required new recurring time")
 
+        id = argv[1]
         report_time = argv[2]
-        change_client_report_time(id, report_time)
+        if id == "-all":
+            change_all_report_time(report_time)
+        else:
+            change_client_report_time(id, report_time)
     else:
         print_usage()
 
