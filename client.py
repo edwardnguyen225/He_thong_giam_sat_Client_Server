@@ -1,12 +1,13 @@
-from json.decoder import JSONDecodeError
 import sys
 import os
 import time
 import json
 import socket
 import threading
+import checker
 
 import monitor as monitor
+from json.decoder import JSONDecodeError
 
 CMD_REGISTER = "-register"
 CMD_START = "-start"
@@ -20,7 +21,7 @@ def print_usage():
     # print(pre_cmd + CMD_MONITOR_SYSTEM)
 
 
-def register():
+def register(server, port=12345):
     """
     Register this computer (Client) to the Server
     Send TCP message to Server, including: Name, IP, UDP port, Current date time
@@ -31,15 +32,52 @@ def register():
             Start monitor system
         Else responded msg is failed, display error message
     """
-    pass
-
-
-def is_IP(str):
     try:
-        socket.inet_aton(str)
-    except socket.error:
-        return False
-    return True
+        HEADER = 64
+        ADDR = (server, port)
+        FORMAT = 'utf-8'
+        _client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        _client.settimeout(1)
+        _client.connect(ADDR)
+        message = create_register_msg().encode(FORMAT)
+        msg_length = len(message)
+        send_length = str(msg_length).encode(FORMAT)
+        send_length += b' ' * (HEADER - len(send_length))
+        _client.send(send_length)
+        _client.send(message)
+        response = _client.recv(2048).decode(FORMAT)
+        if response.find("[RegisterFailed]") != -1:
+            raise Exception(response)
+        print("[REGISTER] Register succeed. Saving necessary information.")
+        create_client_info(server, response)
+    except socket.timeout:
+        raise socket.timeout
+    except ConnectionRefusedError:
+        raise ConnectionRefusedError
+
+
+def create_register_msg():
+    msg = "#"
+    name = monitor.get_system_name()
+    udp_port = 5050
+    mac_address = monitor.get_mac_address()
+    msg += f"{name},{udp_port},{mac_address}"
+    return msg
+
+
+def create_client_info(server_ip, server_response):
+    info_start_index = server_response.index("]")
+    info = server_response[info_start_index+1:]
+    id, server_tcp_port, recurring_time = info.split(",")
+    client_info = {
+        "id": id,
+        "server_ip": server_ip,
+        "server_tcp_port": int(server_tcp_port),
+        "recurring_time": int(recurring_time)
+    }
+    path_to_client_json = os.path.join(
+        ".", "database", "client", "client_info.json")
+    monitor.write_JSON(client_info, path_to_client_json)
 
 
 class Client:
@@ -214,13 +252,22 @@ def main(argv):
         return
 
     if argv[0] == CMD_REGISTER:
-        register()
-        return
+        if len(argv) < 2:
+            raise Exception("Server IP address must be provided")
+
+        server = argv[1]
+        if not checker.is_IP(server):
+            raise ValueError("Invalid IP address")
+
+        register(server)
 
     elif argv[0] == CMD_START:
         server = None
         if len(argv) > 1:
             server = argv[1]
+
+        if not checker.is_IP(server):
+            raise ValueError("Invalid IP address")
 
         client = Client(server)
         client.start()

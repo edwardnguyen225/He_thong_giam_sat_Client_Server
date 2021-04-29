@@ -1,6 +1,7 @@
 import json
 import datetime
 import copy
+import socket
 
 ERROR_VALUE = "ValueError"
 ERROR_NOT_ENOUGH_KEYS = "MissingKeyError"
@@ -45,6 +46,16 @@ def is_name_correct(name, id, list_of_clients):
         return False
 
 
+def does_mac_address_exist(mac_address, list_of_clients):
+    mac_address_key = "MAC Address"
+    for client_info in list(list_of_clients.values()):
+        tmp = client_info[mac_address_key]
+        print(f"{mac_address} ? {tmp}")
+        if mac_address == client_info[mac_address_key]:
+            return True
+    return False
+
+
 def get_report_error(report_json):
     """
     Check if report has any error
@@ -58,7 +69,8 @@ def get_report_error(report_json):
     }
     try:
         datetime_str = list(report_json.keys())[0]
-        validate_format(datetime_str, TYPE_DATETIME, errors, "Report timestamp")
+        validate_format(datetime_str, TYPE_DATETIME,
+                        errors, "Report timestamp")
     except:
         return "No report timestamp"
 
@@ -155,6 +167,14 @@ def is_frequency(str):
     try:
         fr = float(tmp_str)
     except ValueError:
+        return False
+    return True
+
+
+def is_IP(str):
+    try:
+        socket.inet_aton(str)
+    except socket.error:
         return False
     return True
 

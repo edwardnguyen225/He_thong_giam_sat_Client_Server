@@ -2,6 +2,7 @@ import json
 import psutil
 import platform
 from datetime import datetime
+from getmac import get_mac_address as gma
 
 
 def get_size(bytes, suffix="B"):
@@ -26,7 +27,8 @@ def get_system_info():
         "Release": uname.release,
         "Version": uname.version,
         "Machine": uname.machine,
-        "Processor": uname.processor
+        "Processor": uname.processor,
+        "MAC Address": gma()
     }
     return system_info
 
@@ -34,6 +36,9 @@ def get_system_info():
 def get_system_name():
     uname = platform.uname()
     return uname.node
+
+def get_mac_address():
+    return gma()
 
 
 def print_system_info():
