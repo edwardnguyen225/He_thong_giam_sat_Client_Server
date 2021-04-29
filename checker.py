@@ -46,6 +46,14 @@ def is_name_correct(name, id, list_of_clients):
         return False
 
 
+def is_mac_address_correct(mac_address, id, list_of_clients):
+    # try catch is to prevent id not exist
+    try:
+        return mac_address == list_of_clients[id]["MAC Address"]
+    except:
+        return False
+
+
 def does_mac_address_exist(mac_address, list_of_clients):
     mac_address_key = "MAC Address"
     for client_info in list(list_of_clients.values()):
