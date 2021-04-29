@@ -60,7 +60,8 @@ def create_register_msg():
     msg = "#"
     name = monitor.get_system_name()
     udp_port = 5050
-    msg += f"{name},{udp_port}"
+    mac_address = monitor.get_mac_address()
+    msg += f"{name},{udp_port},{mac_address}"
     return msg
 
 
