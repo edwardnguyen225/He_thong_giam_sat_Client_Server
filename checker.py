@@ -1,6 +1,7 @@
 import json
 import datetime
 import copy
+import socket
 
 ERROR_VALUE = "ValueError"
 ERROR_NOT_ENOUGH_KEYS = "MissingKeyError"
@@ -58,7 +59,8 @@ def get_report_error(report_json):
     }
     try:
         datetime_str = list(report_json.keys())[0]
-        validate_format(datetime_str, TYPE_DATETIME, errors, "Report timestamp")
+        validate_format(datetime_str, TYPE_DATETIME,
+                        errors, "Report timestamp")
     except:
         return "No report timestamp"
 
@@ -155,6 +157,14 @@ def is_frequency(str):
     try:
         fr = float(tmp_str)
     except ValueError:
+        return False
+    return True
+
+
+def is_IP(str):
+    try:
+        socket.inet_aton(str)
+    except socket.error:
         return False
     return True
 
