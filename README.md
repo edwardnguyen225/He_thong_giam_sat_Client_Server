@@ -26,7 +26,11 @@ python client.py -monitor-system
 python server.py -listen
 python server.py -list-all-clients
 python server.py -export-report <client's id>
-python server.py -change-report-time <device's id> <time in seconds>
+
+# Input id for specific Client
+python server.py -change-report-time <client's id> <time in seconds>
+# If want to send new recurring time to all Client, input as below
+python server.py -change-report-time -all <time in seconds>
 ```
 
 ## Author
