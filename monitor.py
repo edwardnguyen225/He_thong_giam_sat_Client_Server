@@ -161,7 +161,7 @@ class Report:
         dict = {}
         dict[str(self.init_time)] = {
             "Boot time": str(self.boot_time),
-            "CPU info": str(self.cpu_info),
+            "CPU info": self.cpu_info,
             "Memory usage": self.mem_usage
             # ,"Disk usage": self.disk_usage
         }
