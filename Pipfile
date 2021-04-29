@@ -8,6 +8,7 @@ psutil = "*"
 tk = "*"
 pyinstaller = "*"
 tabulate = "*"
+getmac = "*"
 
 [dev-packages]
 autopep8 = "*"
