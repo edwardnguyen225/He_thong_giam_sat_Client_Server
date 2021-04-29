@@ -151,11 +151,33 @@ class Client:
         return report
 
     def listen_for_UDP(self):
+        """
+        Continuously listen for UDP connections from Server side
+        If received UDP msg then proceed handle_server_UDP_msg
+        """
+        # TODO: create UDP socket, continuously listen for UDP connections
+        #       if received UDP msg then handle_server_UDP_msg
+        
+        # clientUDP = socket.socket(
+        #     socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)  # UDP
+        # clientUDP.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        # clientUDP.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        # clientUDP.bind(("", self.UDP_PORT))
         while not self.is_quitting:
             print("[Listening]")
             time.sleep(1)
+            pass
 
-    def handle_server_UDP_msg():
+    def handle_server_UDP_msg(self, msg):
+        """
+        Validate UDP msg from Server
+        If valid then retrieve new_recurring_time
+            and proceed update_reccurring_time(new_recurring_time)
+        Send back to server Successful
+        """
+        # TODO: retrieve new_recurring_time from msg
+        # NOTE: can change the parameters if necessary
+
         pass
 
     # def get_message_UDP(id):
