@@ -15,16 +15,24 @@ pipenv install
 
 ## Usage
 
-```python
+```bash
 # Sử dụng cmd cho Client
-python client.py -register
-python client.py -monitor-system
+# Đăng ký mới
+python client.py -register <server's id>
+
+# Khởi động Client
+python client.py -start
 ```
 
-```python
+```bash
 # Sử dụng cmd cho Server
+# Khởi động Server
 python server.py -listen
+
+# Liệt kê mọi Client
 python server.py -list-all-clients
+
+# Xuất báo cáo Client ra file csv
 python server.py -export-report <client's id>
 
 # Input id for specific Client
