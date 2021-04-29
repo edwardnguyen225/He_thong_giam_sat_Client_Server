@@ -31,6 +31,7 @@ MSG_SUCCESS = "[Successful]"
 PREFIX_FAILED = "[Failed]"
 MSG_ERR_WRONG_PREFIX = PREFIX_FAILED + "MsgPrefixError"
 MSG_ERR_UNKNOWN_ID = PREFIX_FAILED + "UnknownIDError"
+MSG_ERR_UNKNOWN_MAC = PREFIX_FAILED + "UnknownMacAddrError"
 MSG_ERR_UNKNOWN_NAME = PREFIX_FAILED + "UnknownNameError"
 
 MSG_TYPE_REGISTER = "Register"
@@ -124,8 +125,8 @@ def handle_client_report(conn, addr, msg):
         return
 
     json_start_index = msg.index("{")
-    name = msg[client_name_prefix_index + 1:json_start_index]
-    if not checker.is_name_correct(name, client_id, list_of_clients):
+    mac_address = msg[client_name_prefix_index + 1:json_start_index]
+    if not checker.is_mac_address_correct(mac_address, client_id, list_of_clients):
         conn.send(MSG_ERR_UNKNOWN_NAME.encode(FORMAT))
         return
 

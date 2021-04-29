@@ -90,6 +90,7 @@ class Client:
         self.load_client_info()
 
         self.name = monitor.get_system_name()
+        self.MAC_ADDRESS = monitor.get_mac_address()
         self.UDP_PORT = 5050
         self.HEADER = 64
         self.FORMAT = 'utf-8'
@@ -115,7 +116,7 @@ class Client:
         try:
             self.is_quitting = False
             monitor = threading.Thread(target=self.monitor_system)
-            # monitor.start()
+            monitor.start()
 
             listen_for_UDP = threading.Thread(
                 target=self.listen_for_UDP)
@@ -129,14 +130,14 @@ class Client:
             print('\n! Received keyboard interrupt, quitting threads.')
             print("  Please wait until program exit completely...")
             self.is_quitting = True
-            # monitor.join()
+            monitor.join()
             listen_for_UDP.join()
             sys.exit()
         except Exception:
             print(f'\n! {Exception}, quitting threads.')
             print("  Please wait until program exit completely...")
             self.is_quitting = True
-            # monitor.join()
+            monitor.join()
             listen_for_UDP.join()
             sys.exit()
 
@@ -150,7 +151,7 @@ class Client:
         while not self.is_quitting:
             print(f"[REPORTING] Report number: {report_count}")
             msg = ">"  # For reporting purpose
-            msg += str(self.ID) + "@" + self.name
+            msg += str(self.ID) + "@" + self.MAC_ADDRESS
 
             report = self.get_report_str()
             msg += report
@@ -265,9 +266,8 @@ def main(argv):
         server = None
         if len(argv) > 1:
             server = argv[1]
-
-        if not checker.is_IP(server):
-            raise ValueError("Invalid IP address")
+            if not checker.is_IP(server):
+                raise ValueError("Invalid IP address")
 
         client = Client(server)
         client.start()
