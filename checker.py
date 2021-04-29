@@ -46,6 +46,16 @@ def is_name_correct(name, id, list_of_clients):
         return False
 
 
+def does_mac_address_exist(mac_address, list_of_clients):
+    mac_address_key = "MAC Address"
+    for client_info in list(list_of_clients.values()):
+        tmp = client_info[mac_address_key]
+        print(f"{mac_address} ? {tmp}")
+        if mac_address == client_info[mac_address_key]:
+            return True
+    return False
+
+
 def get_report_error(report_json):
     """
     Check if report has any error
