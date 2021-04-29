@@ -133,3 +133,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+database/server/reports/0_report.json
