@@ -79,14 +79,6 @@ def create_client_info(server_ip, server_response):
     monitor.write_JSON(client_info, path_to_client_json)
 
 
-def is_IP(str):
-    try:
-        socket.inet_aton(str)
-    except socket.error:
-        return False
-    return True
-
-
 class Client:
     def __init__(self, server=None):
         # Check if client is registered
