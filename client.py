@@ -77,7 +77,7 @@ class Client:
         try:
             self.is_quitting = False
             monitor = threading.Thread(target=self.monitor_system)
-            monitor.start()
+            # monitor.start()
 
             listen_for_UDP = threading.Thread(
                 target=self.listen_for_UDP)
@@ -91,14 +91,14 @@ class Client:
             print('\n! Received keyboard interrupt, quitting threads.')
             print("  Please wait until program exit completely...")
             self.is_quitting = True
-            monitor.join()
+            # monitor.join()
             listen_for_UDP.join()
             sys.exit()
         except Exception:
             print(f'\n! {Exception}, quitting threads.')
             print("  Please wait until program exit completely...")
             self.is_quitting = True
-            monitor.join()
+            # monitor.join()
             listen_for_UDP.join()
             sys.exit()
 
