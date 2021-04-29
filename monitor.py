@@ -60,7 +60,7 @@ def get_cpu_info():
     cpu_freq = psutil.cpu_freq()
     cpu_info = {
         "Physical cores": psutil.cpu_count(logical=False),
-        "Total cores": psutil.cpu_count(logical=True),
+        "Total threads": psutil.cpu_count(logical=True),
         "Max Frequency": f'{cpu_freq.max:.2f}Mhz',
         "Min Frequency": f'{cpu_freq.min:.2f}Mhz',
         "Current Frequency": f'{cpu_freq.current:.2f}Mhz'
@@ -153,6 +153,7 @@ class Report:
     def __init__(self):
         self.init_time = datetime.now()
         self.boot_time = get_boot_time()
+        self.cpu_info = get_cpu_info()
         self.mem_usage = get_memory_usage()
         self.disk_usage = get_disk_usage()
 
@@ -160,10 +161,11 @@ class Report:
         dict = {}
         dict[str(self.init_time)] = {
             "Boot time": str(self.boot_time),
+            "CPU info": str(self.cpu_info),
             "Memory usage": self.mem_usage
             # ,"Disk usage": self.disk_usage
         }
         return dict
 
-    def to_string(self):
+    def __str__(self):
         return json.dumps(self.to_dict())
