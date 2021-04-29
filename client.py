@@ -65,7 +65,7 @@ class Client:
             msg = ">"  # For reporting purpose
             msg += str(self.ID) + "@" + self.name
             
-            report = self.get_report()
+            report = self.get_report_str()
             msg += report
             self.send(msg)
 
@@ -84,8 +84,8 @@ class Client:
         _client.send(message)
         print(_client.recv(2048).decode(self.FORMAT))
 
-    def get_report(self):
-        report = monitor.Report().to_string()
+    def get_report_str(self):
+        report = str(monitor.Report())
         return report
 
 
