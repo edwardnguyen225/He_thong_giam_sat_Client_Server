@@ -16,7 +16,7 @@ def print_usage():
     pre_cmd = "python client.py "
     print(pre_cmd + CMD_REGISTER)
     print(pre_cmd + CMD_START)
-    print(pre_cmd + CMD_MONITOR_SYSTEM)
+    # print(pre_cmd + CMD_MONITOR_SYSTEM)
 
 
 def register():
@@ -148,12 +148,12 @@ def main(argv):
         register()
         return
 
-    client = Client()
-    if argv[0] == CMD_START:
-        client.start()
-    elif argv[0] == CMD_MONITOR_SYSTEM:
+    elif argv[0] == CMD_START:
         client = Client()
-        client.monitor_system()
+        client.start()
+
+    else:
+        print_usage()
 
 
 if __name__ == "__main__":
