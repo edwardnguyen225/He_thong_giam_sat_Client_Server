@@ -6,7 +6,9 @@ import time
 import checker
 import os
 import csv
+import monitor
 
+from datetime import datetime
 from tabulate import tabulate
 try:
     from collections.abc import MutableMapping
@@ -31,8 +33,10 @@ MSG_ERR_WRONG_PREFIX = PREFIX_FAILED + "MsgPrefixError"
 MSG_ERR_UNKNOWN_ID = PREFIX_FAILED + "UnknownIDError"
 MSG_ERR_UNKNOWN_NAME = PREFIX_FAILED + "UnknownNameError"
 
+MSG_TYPE_REGISTER = "Register"
 MSG_TYPE_REPORT = "Add new report"
 msg_type_dict = {
+    "#": MSG_TYPE_REGISTER,
     ">": MSG_TYPE_REPORT
 }
 
@@ -82,7 +86,7 @@ def listen():
         thread = threading.Thread(
             target=handle_client, args=(conn, addr), daemon=True)
         thread.start()
-        print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
+        # print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
 
 
 def handle_client(conn, addr):
@@ -99,13 +103,20 @@ def handle_client(conn, addr):
             return
 
         msg_type = msg_type_dict[msg[0]]
+        print("\n" + msg + "\n")
         if msg_type == MSG_TYPE_REPORT:
             handle_client_report(conn, addr, msg)
+        elif msg_type == MSG_TYPE_REGISTER:
+            handle_client_register(conn, addr, msg)
 
     conn.close()
 
 
 def handle_client_report(conn, addr, msg):
+    """
+    prefix = ">"
+    valid msg = prefix + "<id>@<client name><report in json>"
+    """
     client_name_prefix_index = msg.index("@")
     client_id = msg[1:client_name_prefix_index]
     print(f"[{addr}] {MSG_TYPE_REPORT} from id({client_id})")
@@ -130,13 +141,59 @@ def handle_client_report(conn, addr, msg):
     conn.send("[Successful]".encode(FORMAT))
 
 
-def create_new_client(name, ip, udp_port, register_date):
+def handle_client_register(conn, addr, msg):
+    """
+    prefix = "#"
+    valid msg = prefix + "<name>,<ip>,<udp_port>"
+    Return: "[RegisterSuccess]<id>,<server_ip>,<server_tcp_port>,<recurring_time>" if successful
+            else "[RegisterFailed]"
+    """
+    msg_success = "[RegisterSuccess]"
+    msg_failed = "[RegisterFailed]"
+    print(f"[NEW REGISTRATION] Got new registration from {addr}")
+
+    try:
+        name, udp_port = msg[1:].split(",")
+
+        udp_port = int(udp_port)
+    except Exception:
+        msg_failed += "Failed before validations"
+        conn.send(msg_failed.encode(FORMAT))
+        print(Exception("Registration Failed"))
+
+    id = get_new_client_id()
+    create_new_client(id, name, addr, udp_port)
+    msg_success += create_regis_postfix(id)
+    conn.send(msg_success.encode(FORMAT))
+
+
+def create_new_client(id, name, ip, udp_port):
     """
     Create new client
     Save new client into List_of_clients.json
     Return True if successful, else False
     """
-    pass
+    client = {
+        "name": name,
+        "ip": ip,
+        "client_udp_port": udp_port,
+        "register_time": str(datetime.now())
+    }
+    list_of_clients[id] = client
+    monitor.write_JSON(list_of_clients,path_to_list_of_clients)
+
+
+def create_regis_postfix(id, recurring_time=3):
+    # <id>,<server_tcp_port>,<recurring_time>
+    postfix = f"{id},{PORT},{recurring_time}"
+    return postfix
+
+
+def get_new_client_id():
+    last_id = list(list_of_clients.keys())[-1]
+    tmp_id = int(last_id) + 1
+    id = str(tmp_id)
+    return id
 
 
 def print_list_of_clients():
