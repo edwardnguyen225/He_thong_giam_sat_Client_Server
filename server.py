@@ -2,6 +2,7 @@ import sys
 import socket
 import threading
 import json
+import time
 import checker
 import os
 import csv
@@ -78,7 +79,8 @@ def listen():
         conn, addr = server.accept()
 
         # Create new thread for each connection
-        thread = threading.Thread(target=handle_client, args=(conn, addr))
+        thread = threading.Thread(
+            target=handle_client, args=(conn, addr), daemon=True)
         thread.start()
         print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
 
@@ -234,25 +236,25 @@ def flatten_dict(d, parent_key='', sep='_'):
 
 
 def change_client_report_time(id, report_time):
-    
-    if id==-10:
-    # Set a timeout so the socket does not block
-    # indefinitely when trying to receive data.
-        serverUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+
+    if id == -10:
+        # Set a timeout so the socket does not block
+        # indefinitely when trying to receive data.
+        serverUDP = socket.socket(
+            socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         serverUDP.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         serverUDP.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         serverUDP.settimeout(0.2)
-        message = (id,report_time)
+        message = (id, report_time)
         while True:
             serverUDP.sendto(message, ('<broadcast>', PORT))
             print("message sent!")
             time.sleep(1)
-    elif id!=-1:
-        #send UDP message to a client 
-        serverUDP=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+    elif id != -1:
+        # send UDP message to a client
+        serverUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         serverUDP.bind(ADDR)
-        serverUDP.sendto(message,id)
-    pass
+        # serverUDP.sendto(message, id)
 
 
 def main(argv):
