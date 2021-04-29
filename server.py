@@ -30,9 +30,9 @@ MSG_ERR_WRONG_PREFIX = PREFIX_FAILED + "MsgPrefixError"
 MSG_ERR_UNKNOWN_ID = PREFIX_FAILED + "UnknownIDError"
 MSG_ERR_UNKNOWN_NAME = PREFIX_FAILED + "UnknownNameError"
 
-
+MSG_TYPE_REPORT = "Add new report"
 msg_type_dict = {
-    ">": "Add new report"
+    ">": MSG_TYPE_REPORT
 }
 
 path_to_list_of_clients = os.path.join(
@@ -97,34 +97,35 @@ def handle_client(conn, addr):
             return
 
         msg_type = msg_type_dict[msg[0]]
-
-        client_name_prefix_index = msg.index("@")
-        client_id = msg[1:client_name_prefix_index]
-        print(f"[{addr}] {msg_type} from id({client_id})")
-        if not checker.is_id_registered(client_id, list_of_clients):
-            conn.send(MSG_ERR_UNKNOWN_ID.encode(FORMAT))
-            conn.close()
-            return
-
-        json_start_index = msg.index("{")
-        name = msg[client_name_prefix_index + 1:json_start_index]
-        if not checker.is_name_correct(name, client_id, list_of_clients):
-            conn.send(MSG_ERR_UNKNOWN_NAME.encode(FORMAT))
-            conn.close()
-            return
-
-        report = json.loads(msg[json_start_index:])
-        errors = checker.get_report_error(report)
-        if errors:
-            errors = PREFIX_FAILED + errors
-            conn.send(errors.encode(FORMAT))
-            conn.close()
-            return
-
-        add_new_report(client_id, report)
-        conn.send("[Successful]".encode(FORMAT))
+        if msg_type == MSG_TYPE_REPORT:
+            handle_client_report(conn, addr, msg)
 
     conn.close()
+
+
+def handle_client_report(conn, addr, msg):
+    client_name_prefix_index = msg.index("@")
+    client_id = msg[1:client_name_prefix_index]
+    print(f"[{addr}] {MSG_TYPE_REPORT} from id({client_id})")
+    if not checker.is_id_registered(client_id, list_of_clients):
+        conn.send(MSG_ERR_UNKNOWN_ID.encode(FORMAT))
+        return
+
+    json_start_index = msg.index("{")
+    name = msg[client_name_prefix_index + 1:json_start_index]
+    if not checker.is_name_correct(name, client_id, list_of_clients):
+        conn.send(MSG_ERR_UNKNOWN_NAME.encode(FORMAT))
+        return
+
+    report = json.loads(msg[json_start_index:])
+    errors = checker.get_report_error(report)
+    if errors:
+        errors = PREFIX_FAILED + errors
+        conn.send(errors.encode(FORMAT))
+        return
+
+    add_new_report(client_id, report)
+    conn.send("[Successful]".encode(FORMAT))
 
 
 def create_new_client(name, ip, udp_port, register_date):
@@ -209,7 +210,8 @@ def export_report_to_csv(id):
                 writer.writerow(row)
             csv_file.close()
 
-            print(f"Export Client {id} report successfully. Path to CSV file is: {csv_path}")
+            print(
+                f"Export Client {id} report successfully. Path to CSV file is: {csv_path}")
     except IOError:
         raise IOError
 
