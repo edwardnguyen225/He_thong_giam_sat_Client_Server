@@ -1,3 +1,4 @@
+.vscode/
 # Reports
 database/server/reports/*.json
 # csv
