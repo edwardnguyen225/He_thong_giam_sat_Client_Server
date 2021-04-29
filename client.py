@@ -157,7 +157,7 @@ class Client:
         """
         # TODO: create UDP socket, continuously listen for UDP connections
         #       if received UDP msg then handle_server_UDP_msg
-        
+
         # clientUDP = socket.socket(
         #     socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)  # UDP
         # clientUDP.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
@@ -202,7 +202,10 @@ class Client:
     def update_server_ip(self, server):
         self.update_client_json("server_ip", server)
         self.SERVER = server
-        pass
+
+    def update_reccurring_time(self, recurring_time):
+        self.update_client_json("recurring_time", recurring_time)
+        self.recurring_time = recurring_time
 
 
 def main(argv):
