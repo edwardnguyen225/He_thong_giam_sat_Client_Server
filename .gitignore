@@ -1,3 +1,8 @@
+# Reports
+database/server/reports/*.json
+# csv
+csv/*.csv
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
