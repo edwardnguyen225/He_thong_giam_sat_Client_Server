@@ -14,15 +14,7 @@ pipenv install
 ```
 
 ## Usage
-
-```bash
-# Sử dụng cmd cho Client
-# Đăng ký mới
-python client.py -register <server's id>
-
-# Khởi động Client
-python client.py -start
-```
+Bắt buộc Server phải được khởi động trước khi client.py được sử dụng
 
 ```bash
 # Sử dụng cmd cho Server
@@ -41,6 +33,14 @@ python server.py -change-report-time <client's id> <time in seconds>
 python server.py -change-report-time -all <time in seconds>
 ```
 
+```bash
+# Sử dụng cmd cho Client
+# Đăng ký mới
+python client.py -register <server's id>
+
+# Khởi động Client
+python client.py -start
+```
 ## Author
 
 - [Nguyễn Trí Nhân](https://github.com/edwardnguyen2255)
