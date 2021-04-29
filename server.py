@@ -103,7 +103,6 @@ def handle_client(conn, addr):
             return
 
         msg_type = msg_type_dict[msg[0]]
-        print("\n" + msg + "\n")
         if msg_type == MSG_TYPE_REPORT:
             handle_client_report(conn, addr, msg)
         elif msg_type == MSG_TYPE_REGISTER:
