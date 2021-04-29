@@ -88,7 +88,8 @@ class Client:
             while not self.is_quitting:
                 time.sleep(100)
         except KeyboardInterrupt:
-            print('\n! Received keyboard interrupt, quitting threads.\n')
+            print('\n! Received keyboard interrupt, quitting threads.')
+            print("  Please wait until program exit completely...")
             self.is_quitting = True
             monitor.join()
             listen_for_UDP.join()
