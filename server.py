@@ -149,24 +149,33 @@ def handle_client_register(conn, addr, msg):
     """
     msg_success = "[RegisterSuccess]"
     msg_failed = "[RegisterFailed]"
+    is_failed = False
     print(f"[NEW REGISTRATION] Got new registration from {addr}")
 
     try:
-        name, udp_port = msg[1:].split(",")
-
+        name, udp_port, mac_address = msg[1:].split(",")
         udp_port = int(udp_port)
+        print(mac_address)
+        if checker.does_mac_address_exist(mac_address, list_of_clients):
+            msg_failed += "Client already registered"
+            is_failed = True
+
     except Exception:
         msg_failed += "Failed before validations"
-        conn.send(msg_failed.encode(FORMAT))
         print(Exception("Registration Failed"))
+        is_failed = True
+
+    if is_failed:
+        conn.send(msg_failed.encode(FORMAT))
+        return
 
     id = get_new_client_id()
-    create_new_client(id, name, addr, udp_port)
+    create_new_client(id, name, addr[0], mac_address, udp_port)
     msg_success += create_regis_postfix(id)
     conn.send(msg_success.encode(FORMAT))
 
 
-def create_new_client(id, name, ip, udp_port):
+def create_new_client(id, name, ip, mac_address, udp_port):
     """
     Create new client
     Save new client into List_of_clients.json
@@ -175,11 +184,12 @@ def create_new_client(id, name, ip, udp_port):
     client = {
         "name": name,
         "ip": ip,
+        "MAC Address": mac_address,
         "client_udp_port": udp_port,
         "register_time": str(datetime.now())
     }
     list_of_clients[id] = client
-    monitor.write_JSON(list_of_clients,path_to_list_of_clients)
+    monitor.write_JSON(list_of_clients, path_to_list_of_clients)
 
 
 def create_regis_postfix(id, recurring_time=3):
