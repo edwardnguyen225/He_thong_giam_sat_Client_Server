@@ -5,17 +5,27 @@ import copy
 ERROR_VALUE = "ValueError"
 ERROR_NOT_ENOUGH_KEYS = "MissingKeyError"
 
-DATETIME = "datetime"
-SIZE = "size"
+TYPE_DATETIME = "datetime"
+TYPE_SIZE = "size"
+TYPE_FREQUENCY = "frequency"
+TYPE_INT = "integer"
+TYPE_FLOAT = "float"
 
 REPORT_LAYOUT = {
-    DATETIME: {
-        "Boot time": DATETIME,
+    TYPE_DATETIME: {
+        "Boot time": TYPE_DATETIME,
+        "CPU info": {
+            "Physical cores": TYPE_INT,
+            "Total threads": TYPE_INT,
+            "Max Frequency": TYPE_FREQUENCY,
+            "Min Frequency": TYPE_FREQUENCY,
+            "Current Frequency": TYPE_FREQUENCY
+        },
         "Memory usage": {
-            "Total": SIZE,
-            "Available": SIZE,
-            "Used": SIZE,
-            "Percentage": "float"
+            "Total": TYPE_SIZE,
+            "Available": TYPE_SIZE,
+            "Used": TYPE_SIZE,
+            "Percentage": TYPE_FLOAT
         }
     }
 }
@@ -46,11 +56,14 @@ def get_report_error(report_json):
         ERROR_NOT_ENOUGH_KEYS: [],
         ERROR_VALUE: []
     }
-    datetime_str = list(report_json.keys())[0]
-    validate_format(datetime_str, DATETIME, errors, "Report timestamp")
+    try:
+        datetime_str = list(report_json.keys())[0]
+        validate_format(datetime_str, TYPE_DATETIME, errors, "Report timestamp")
+    except:
+        return "No report timestamp"
 
     report_inner = report_json[datetime_str]
-    validate_dict(report_inner, REPORT_LAYOUT[DATETIME], errors)
+    validate_dict(report_inner, REPORT_LAYOUT[TYPE_DATETIME], errors)
 
     errors_return = ""
     for error_type, error_content in errors.items():
@@ -96,17 +109,21 @@ def validate_dict_keys(curr_dict, template, errors, parent_key=None):
 
 
 def validate_format(value, format, errors, key_path):
-    if format == DATETIME and not is_datetime(value):
-        errors[ERROR_VALUE].append(key_path + "!=" + DATETIME)
-    elif format == SIZE and not is_storage_size(value):
-        errors[ERROR_VALUE].append(key_path + "!=" + SIZE)
-    elif format == "float" and type(value) is not float:
-        errors[ERROR_VALUE].append(key_path + "!=" + "float")
+    if format == TYPE_DATETIME and not is_datetime(value):
+        errors[ERROR_VALUE].append(key_path + "!=" + TYPE_DATETIME)
+    elif format == TYPE_SIZE and not is_storage_size(value):
+        errors[ERROR_VALUE].append(key_path + "!=" + TYPE_SIZE)
+    elif format == TYPE_FREQUENCY and not is_frequency(value):
+        errors[ERROR_VALUE].append(key_path + "!=" + TYPE_FREQUENCY)
+    elif format == TYPE_FLOAT and type(value) is not float:
+        errors[ERROR_VALUE].append(key_path + "!=" + TYPE_FLOAT)
+    elif format == TYPE_INT and type(value) is not int:
+        errors[ERROR_VALUE].append(key_path + "!=" + TYPE_INT)
 
 
 def is_datetime(datetime_str):
     try:
-        datetime.datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S.%f')
+        datetime.datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S.%f")
     except:
         return False
     return True
@@ -131,24 +148,44 @@ def is_storage_size(str):
     return True
 
 
+def is_frequency(str):
+    tmp_str = copy.deepcopy(str)
+    unit = "Mhz"
+    tmp_str = tmp_str.replace(unit, "")
+    try:
+        fr = float(tmp_str)
+    except ValueError:
+        return False
+    return True
+
+
 def main():
     msg = """
-        {
-            "2021-04-26 09:19:01.214034": {
-                "Boot time": "2021-04-25 10:17:54.214035",
-                "Memory usage": {
-                    "Total": "15.88GB",
-                    "Available": "6.22GB",
-                    "Used": "9.66GB",
-                    "Percentage": 60.8
-                }
+    {
+        "2021-04-29 10:26:14.684033": {
+            "Boot time": "2021-04-28 10:30:44.926089",
+            "CPU info": {
+                "Physical cores": 4,
+                "Total threads": 8,
+                "Max Frequency": "1896.00Mhz",
+                "Min Frequency": "0.00Mhz",
+                "Current Frequency": "1696.00Mhz"
+            },
+            "Memory usage": {
+                "Total": "15.88GB",
+                "Available": "5.33GB",
+                "Used": "10.55GB",
+                "Percentage": 66.4
             }
         }
+    }
     """
     report = json.loads(msg)
     errors = get_report_error(report)
     if errors:
         print(errors)
+    else:
+        print("Report valid")
 
 
 if __name__ == "__main__":
