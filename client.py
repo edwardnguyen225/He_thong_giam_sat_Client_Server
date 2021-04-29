@@ -1,3 +1,4 @@
+from json.decoder import JSONDecodeError
 import sys
 import os
 import time
@@ -33,30 +34,44 @@ def register():
     pass
 
 
+def is_IP(str):
+    try:
+        socket.inet_aton(str)
+    except socket.error:
+        return False
+    return True
+
+
 class Client:
-    def __init__(self):
+    def __init__(self, server=None):
         # Check if client is registered
-        path_to_client_json = os.path.join(
+        self.path_to_client_json = os.path.join(
             ".", "database", "client", "client_info.json")
-        if not os.path.isfile(path_to_client_json):
+        if not os.path.isfile(self.path_to_client_json):
             raise Exception("This client is not registered")
-        self.load_client_info(path_to_client_json)
+        self.load_client_info()
 
         self.name = monitor.get_system_name()
         self.UDP_PORT = 5050
         self.HEADER = 64
         self.FORMAT = 'utf-8'
 
-    def load_client_info(self, path_to_client_json):
-        with open(path_to_client_json) as f:
-            client_info = json.load(f)
+        if server != None and server != self.SERVER:
+            self.update_server_ip(server)
 
-        self.ID = client_info["id"]
-        self.SERVER = client_info["server_ip"]
-        self.SERVER = "172.18.240.1"
-        self.PORT = client_info["server_tcp_port"]
-        self.recurring_time = int(client_info["recurring_time"])
-        self.ADDR = (self.SERVER, self.PORT)
+    def load_client_info(self):
+        try:
+            with open(self.path_to_client_json) as f:
+                client_info = json.load(f)
+            self.ID = client_info["id"]
+            self.SERVER = client_info["server_ip"]
+            self.PORT = client_info["server_tcp_port"]
+            self.recurring_time = int(client_info["recurring_time"])
+            self.ADDR = (self.SERVER, self.PORT)
+        except JSONDecodeError:
+            raise JSONDecodeError
+        except IOError:
+            raise IOError
 
     def start(self):
         try:
@@ -70,7 +85,7 @@ class Client:
             listen_for_UDP.start()
 
             # Need time.sleep to allow KeyboardInterrupt
-            while True:
+            while not self.is_quitting:
                 time.sleep(100)
         except KeyboardInterrupt:
             print('\n! Received keyboard interrupt, quitting threads.\n')
@@ -101,18 +116,23 @@ class Client:
             time.sleep(self.recurring_time)
 
     def send_TCP(self, msg):
-        _client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        _client.connect(self.ADDR)
-        message = msg.encode(self.FORMAT)
-        msg_length = len(message)
-        send_length = str(msg_length).encode(self.FORMAT)
-        send_length += b' ' * (self.HEADER - len(send_length))
-        _client.send(send_length)
-        _client.send(message)
-        response = _client.recv(2048).decode(self.FORMAT)
-        if response != "[Successful]":
-            raise Exception(response)
-        print("[Server Response] Report succeed")
+        try:
+            _client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            _client.connect(self.ADDR)
+            message = msg.encode(self.FORMAT)
+            msg_length = len(message)
+            send_length = str(msg_length).encode(self.FORMAT)
+            send_length += b' ' * (self.HEADER - len(send_length))
+            _client.send(send_length)
+            _client.send(message)
+            response = _client.recv(2048).decode(self.FORMAT)
+            if response != "[Successful]":
+                self.is_quitting = True
+                raise Exception(response)
+            print("[Server Response] Report succeed")
+        except ConnectionRefusedError:
+            self.is_quitting = True
+            raise ConnectionRefusedError
 
     def get_report_str(self):
         report = str(monitor.Report())
@@ -138,6 +158,18 @@ class Client:
     #     else:
     #         data, addr = clientUDP.recvfrom(1024)
 
+    def update_client_json(self, key, value):
+        with open(self.path_to_client_json) as f:
+            client_info = json.load(f)
+            client_info[key] = value
+
+        monitor.write_JSON(client_info, self.path_to_client_json)
+
+    def update_server_ip(self, server):
+        self.update_client_json("server_ip", server)
+        self.SERVER = server
+        pass
+
 
 def main(argv):
     if len(argv) < 1:
@@ -149,7 +181,11 @@ def main(argv):
         return
 
     elif argv[0] == CMD_START:
-        client = Client()
+        server = None
+        if len(argv) > 1:
+            server = argv[1]
+
+        client = Client(server)
         client.start()
 
     else:
