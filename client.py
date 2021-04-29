@@ -94,6 +94,13 @@ class Client:
             monitor.join()
             listen_for_UDP.join()
             sys.exit()
+        except Exception:
+            print(f'\n! {Exception}, quitting threads.')
+            print("  Please wait until program exit completely...")
+            self.is_quitting = True
+            monitor.join()
+            listen_for_UDP.join()
+            sys.exit()
 
     def monitor_system(self):
         """
@@ -119,6 +126,7 @@ class Client:
     def send_TCP(self, msg):
         try:
             _client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            _client.settimeout(1)
             _client.connect(self.ADDR)
             message = msg.encode(self.FORMAT)
             msg_length = len(message)
@@ -131,6 +139,9 @@ class Client:
                 self.is_quitting = True
                 raise Exception(response)
             print("[Server Response] Report succeed")
+        except socket.timeout:
+            self.is_quitting = True
+            raise socket.timeout
         except ConnectionRefusedError:
             self.is_quitting = True
             raise ConnectionRefusedError
