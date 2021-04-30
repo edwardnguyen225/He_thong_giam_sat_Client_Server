@@ -1,3 +1,4 @@
+from json.decoder import JSONDecodeError
 import sys
 import socket
 import threading
@@ -44,8 +45,11 @@ msg_type_dict = {
 path_to_list_of_clients = os.path.join(
     ".", "database", "server", "List_of_clients.json")
 
-with open(path_to_list_of_clients) as f:
-    list_of_clients = json.load(f)
+try:
+    with open(path_to_list_of_clients) as f:
+        list_of_clients = json.load(f)
+except JSONDecodeError:
+    list_of_clients = {}
 
 
 def print_usage():
@@ -144,7 +148,7 @@ def handle_client_report(conn, addr, msg):
 def handle_client_register(conn, addr, msg):
     """
     prefix = "#"
-    valid msg = prefix + "<name>,<ip>,<udp_port>"
+    valid msg = prefix + "<name>,<udp_port>,<mac_address>"
     Return: "[RegisterSuccess]<id>,<server_ip>,<server_tcp_port>,<recurring_time>" if successful
             else "[RegisterFailed]"
     """
@@ -156,7 +160,6 @@ def handle_client_register(conn, addr, msg):
     try:
         name, udp_port, mac_address = msg[1:].split(",")
         udp_port = int(udp_port)
-        print(mac_address)
         if checker.does_mac_address_exist(mac_address, list_of_clients):
             msg_failed += "Client already registered"
             is_failed = True
@@ -200,6 +203,8 @@ def create_regis_postfix(id, recurring_time=3):
 
 
 def get_new_client_id():
+    if len(list_of_clients) < 1:
+        return "0"
     last_id = list(list_of_clients.keys())[-1]
     tmp_id = int(last_id) + 1
     id = str(tmp_id)
