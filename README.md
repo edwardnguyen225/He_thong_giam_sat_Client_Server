@@ -36,7 +36,7 @@ python server.py -change-report-time -all <time in seconds>
 ```bash
 # Sử dụng cmd cho Client
 # Đăng ký mới
-python client.py -register <server's id>
+python client.py -register <server's ip>
 
 # Khởi động Client
 python client.py -start
