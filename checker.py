@@ -14,7 +14,7 @@ TYPE_FLOAT = "float"
 
 REPORT_LAYOUT = {
     TYPE_DATETIME: {
-        "Boot time": TYPE_DATETIME,
+        # "Boot time": TYPE_DATETIME,
         "CPU info": {
             "Physical cores": TYPE_INT,
             "Total threads": TYPE_INT,
