@@ -239,12 +239,19 @@ def get_client_report_path(id):
     file_name = id + "_report.json"
     path_to_report = os.path.join(
         ".", "database", "server", "reports", file_name)
+    print("Checking", path_to_report)
+    if not os.path.exists(path_to_report):
+        f = open(path_to_report, "a")
+        f.write("{}")
+        f.close()
+
     return path_to_report
 
 
 def get_client_report(id):
     # Return client report in dict
     path_to_report = get_client_report_path(id)
+
     with open(path_to_report) as f:
         report = json.load(f)
     return report
