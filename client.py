@@ -98,6 +98,8 @@ class Client:
         if server != None and server != self.SERVER:
             self.update_server_ip(server)
 
+        self.ADDR = (self.SERVER, self.PORT)
+
     def load_client_info(self):
         try:
             with open(self.path_to_client_json) as f:
@@ -106,7 +108,6 @@ class Client:
             self.SERVER = client_info["server_ip"]
             self.PORT = client_info["server_tcp_port"]
             self.recurring_time = int(client_info["recurring_time"])
-            self.ADDR = (self.SERVER, self.PORT)
         except JSONDecodeError:
             raise JSONDecodeError
         except IOError:
